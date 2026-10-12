@@ -1,0 +1,136 @@
+---
+/**
+ * reviews (DESIGN.md §5, С2): два круглых рейтинга-стикера с вращающимся кольцом + три стикера-реплики,
+ * которые прилипают слева/справа при прокрутке. Факты — analysis.md «Отзывы».
+ * Награда «Хорошее место 2026» не выводится (не подтверждена).
+ */
+import Section from '../components/Section.astro';
+import { business } from '../data/site';
+
+const asOf = 'на 7 октября 2026 года';
+const ratings = [
+  { value: '4,7', source: '2ГИС', count: '20 оценок', href: business.links.twoGis, tone: 'sauce', tilt: 'tilt-2', ring: '2ГИС — 20 ОЦЕНОК — 2ГИС — 20 ОЦЕНОК — ' },
+  { value: '4,9', source: 'Яндекс Карты', count: '73 оценки', href: '', tone: 'green', tilt: 'tilt-3', ring: 'ЯНДЕКС КАРТЫ — 73 ОЦЕНКИ — ЯНДЕКС КАРТЫ — 73 ОЦЕНКИ — ', verify: '{{VERIFY: рейтинг Яндекс Карт 4,9 и 73 оценки}}' },
+];
+const quotes = [
+  { text: 'Вкусная альтернатива шаверме. Ингридиенты шикарны', date: '7 декабря 2025', iso: '2025-12-07', source: '2ГИС', tone: 'cream', tilt: 'tilt-2', side: 'stick-l' },
+  { text: 'думаешь что это просто снек, но все так сочно и наполнено', date: '26 сентября 2025', iso: '2025-09-26', source: '2ГИС', tone: 'sauce', tilt: 'tilt-3', side: 'stick-r' },
+  { text: 'Крутое место и соусы топ', date: '24 сентября 2026', iso: '2026-09-24', source: '2ГИС', tone: 'green', tilt: 'tilt-2', side: 'stick-l' },
+];
+---
+<Section id="reviews" title="Что говорят гости" class="reviews">
+  <ul class="ratings">
+    {ratings.map((r, i) => (
+      <li class:list={['rating', `r-${r.tone}`, i === 1 && 'rev']}>
+        <div class="coin" aria-hidden="true">
+          <svg class="orbit" viewBox="0 0 260 260" focusable="false">
+            <defs><path id={`ring-${i}`} d="M130 130 m-100 0 a100 100 0 1 1 200 0 a100 100 0 1 1 -200 0" /></defs>
+            <circle class="disc" cx="130" cy="130" r="122" />
+            <text><textPath href={`#ring-${i}`}>{r.ring}</textPath></text>
+          </svg>
+        </div>
+        <p class="num"><span class="sr-only">Рейтинг </span>{r.value}</p>
+        <p class:list={['tag', 't-cream', r.tilt]}>
+          {r.href
+            ? <a href={r.href} target="_blank" rel="noopener">{r.source}, {r.count}</a>
+            : <span>{r.source}, {r.count}</span>}
+          <small>{asOf}</small>
+          {r.verify && <small>{r.verify}</small>}
+        </p>
+      </li>
+    ))}
+  </ul>
+
+  <ul class="quotes">
+    {quotes.map((q) => (
+      <li class:list={['stick', q.side]}>
+        <figure class:list={['bubble', `b-${q.tone}`, q.tilt]}>
+          <blockquote><p>«{q.text}»</p></blockquote>
+          <figcaption>{q.source}, <time datetime={q.iso}>{q.date}</time></figcaption>
+        </figure>
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  :global(.reviews) { position: relative; overflow: clip; background: var(--c-bg); }
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  /* ——— круглые рейтинги ——— */
+  .ratings { display: grid; justify-items: center; gap: var(--s-12); margin-bottom: var(--s-16); }
+  .rating { --sz: min(72vw, 17rem); position: relative; width: var(--sz); height: var(--sz); }
+  .coin, .orbit { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .orbit { overflow: visible; animation: spin var(--d-spin) linear infinite; filter: drop-shadow(0 6px 0 var(--c-ink-shadow)); }
+  .rev .orbit { animation-direction: reverse; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .disc { stroke: var(--c-die); stroke-width: 8; }
+  .orbit text { font: 400 16px var(--f-display); letter-spacing: 0; }
+  .r-sauce .disc { fill: var(--c-accent); }
+  .r-sauce .orbit text { fill: var(--c-on-accent); }
+  .r-green .disc { fill: var(--c-secondary); }
+  .r-green .orbit text { fill: var(--c-on-secondary); }
+  .num {
+    position: absolute; inset: 0; display: grid; place-items: center; margin: 0;
+    font: 400 calc(var(--sz) * 0.26)/1 var(--f-display); white-space: nowrap;
+  }
+  .r-sauce .num { color: var(--c-on-accent); }
+  .r-green .num { color: var(--c-on-secondary); }
+  /* фон под цифрой = цвет круга: явный фон для проверки контраста */
+  .r-sauce .num, .r-green .num { inset: 19%; border-radius: 50%; }
+  .r-sauce .num { background: var(--c-accent); }
+  .r-green .num { background: var(--c-secondary); }
+  .rating .tag {
+    position: absolute; left: 50%; bottom: calc(var(--s-12) * -1); margin: 0; translate: -50% 0; width: max-content; max-width: 92vw;
+    text-align: center; text-transform: none; letter-spacing: 0; font-size: var(--t-body); z-index: var(--z-sticker);
+  }
+  .rating .tag a {
+    display: inline-flex; align-items: center; min-height: var(--tap); margin-block: calc((var(--tap) - 1.15em) / -2);
+    color: var(--c-text); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em;
+  }
+  .rating .tag a:hover { color: var(--c-accent-text); }
+  .rating .tag small { color: var(--c-muted); }
+
+  /* ——— стикеры-реплики ——— */
+  .quotes { display: grid; gap: var(--s-12); }
+  .quotes li { width: min(100%, 26rem); }
+  .quotes li:nth-child(odd) { justify-self: start; }
+  .quotes li:nth-child(even) { justify-self: end; }
+  .bubble {
+    position: relative; margin: 0; padding: var(--s-6) var(--s-6) var(--s-4);
+    border: var(--die-w) solid var(--c-die); border-radius: var(--r-lg); box-shadow: var(--shadow-sticker);
+  }
+  /* хвостик: повёрнутый квадрат, рамка только по двум внешним сторонам */
+  .bubble::after {
+    content: ''; position: absolute; bottom: -15px; left: var(--s-12); width: 26px; height: 26px; rotate: 45deg;
+    background: inherit; border: solid var(--c-die); border-width: 0 var(--die-w) var(--die-w) 0; border-radius: 0 0 6px 0;
+  }
+  .quotes li:nth-child(even) .bubble::after { left: auto; right: var(--s-12); rotate: 45deg; }
+  .b-cream { background: var(--c-surface); color: var(--c-text); }
+  .b-sauce { background: var(--c-accent); color: var(--c-on-accent); }
+  .b-green { background: var(--c-secondary); color: var(--c-on-secondary); }
+  blockquote { margin: 0; }
+  blockquote p {
+    margin: 0; font: 800 clamp(1.25rem, 2vw, 1.5rem)/1.25 var(--f-body); text-wrap: balance;
+  }
+  figcaption { margin-top: var(--s-3); font: 700 var(--t-small)/var(--t-small-lh) var(--f-body); }
+  .b-cream figcaption { color: var(--c-muted); }
+
+  @media (min-width: 768px) {
+    .ratings { grid-template-columns: repeat(2, auto); justify-content: center; gap: var(--s-16); }
+    .rating { --sz: 17rem; }
+    .rating.rev { margin-top: var(--s-12); }
+  }
+  @media (min-width: 1024px) {
+    .ratings { gap: var(--s-24); }
+    .rating { --sz: 19rem; }
+    .quotes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-12); align-items: start; }
+    .quotes li { width: 100%; justify-self: stretch; }
+    .quotes li:nth-child(2) { margin-top: var(--s-16); }
+    .quotes li:nth-child(3) { margin-top: var(--s-8); }
+    .quotes li:nth-child(even) .bubble::after { left: var(--s-12); right: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .orbit { animation: none; }
+  }
+</style>

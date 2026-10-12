@@ -1,0 +1,8 @@
+{
+  "detector": {
+    "ignoreRules": ["cream-palette"]
+  },
+  "reasons": {
+    "cream-palette": "Кремовый взят из логотипа BIGBI (#f8ebc0); фон #fcf6e8 — его светлая ступень. Антиквы и терракоты нет. См. DESIGN.md, С3."
+  }
+}

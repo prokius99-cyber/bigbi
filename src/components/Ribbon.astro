@@ -1,0 +1,34 @@
+---
+/**
+ * Бегущая лента-«скотч» (DESIGN.md §4): первое вхождение стоит у левого края (.head), бежит хвост.
+ * Декор: aria-hidden — смысл каждой фразы продублирован статичным текстом в секции.
+ * <Ribbon items={['Соусы делаем сами', 'Корнер 14']} tone="sauce" tilt={-2} />
+ */
+interface Props {
+  items: string[];
+  tone?: 'sauce' | 'green' | 'ink' | 'cream';
+  tilt?: number;
+  reverse?: boolean;
+  small?: boolean;
+  class?: string;
+}
+const { items, tone = 'sauce', tilt = -2, reverse = false, small = false, class: cls = '' } = Astro.props;
+const [head, ...rest] = items;
+const loop = [...rest, ...items, ...items];
+---
+<div class:list={['ribbon', `rb-${tone}`, reverse && 'rev', small && 'ribbon-sm', cls]} style={`rotate:${tilt}deg`} aria-hidden="true">
+  <span class="head">{head}<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M10.5 0h3v8.4l5.9-5.9 2.1 2.1-5.9 5.9H24v3h-8.4l5.9 5.9-2.1 2.1-5.9-5.9V24h-3v-8.4l-5.9 5.9-2.1-2.1 5.9-5.9H0v-3h8.4L2.5 4.6l2.1-2.1 5.9 5.9z"/></svg></span>
+  <span class="run">
+    {[0, 1].map(() => loop.map((t) => (
+      <span>{t}<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M10.5 0h3v8.4l5.9-5.9 2.1 2.1-5.9 5.9H24v3h-8.4l5.9 5.9-2.1 2.1-5.9-5.9V24h-3v-8.4l-5.9 5.9-2.1-2.1 5.9-5.9H0v-3h8.4L2.5 4.6l2.1-2.1 5.9 5.9z"/></svg></span>
+    )))}
+  </span>
+</div>
+
+<style>
+  .rb-sauce { background: var(--c-accent); color: var(--c-on-accent); }
+  .rb-green { background: var(--c-secondary); color: var(--c-on-secondary); }
+  .rb-ink { background: var(--c-text); color: var(--c-bg); }
+  .rb-cream { background: var(--c-bg); color: var(--c-text); }
+  .ribbon { margin-inline: -4vw; }
+</style>

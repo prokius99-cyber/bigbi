@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.premiumsite/shots/
+.premiumsite/RUN
+.premiumsite/.block-count
+pitch/*.mp4
+
+# рабочие материалы студии — не публикуются
+.premiumsite/
+.claude/
+/analysis.md
+/brief.txt
+/premiumsite-install.mjs
+/photos/
+/assets/
+/CLAUDE.md

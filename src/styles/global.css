@@ -1,0 +1,146 @@
+@import "tailwindcss";
+/* Шрифты: самохостинг woff2. Dela Gothic One — один файл кириллица+латиница (public/fonts, сабсет); Manrope — @fontsource по unicode-range (кириллица + латиница). Итого ≤ 3 файлов. */
+@import "@fontsource-variable/manrope/wght.css";
+@import "./tokens.css";
+
+@font-face {
+  font-family: "Dela Gothic One";
+  src: url("../assets/fonts/dela-gothic-one-cyr-lat.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Классы Tailwind, связанные с токенами: bg-bg, text-text, text-muted, bg-accent, rounded-lg … */
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-text: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-border: var(--c-border);
+  --color-accent: var(--c-accent);
+  --color-on-accent: var(--c-on-accent);
+  --color-accent-text: var(--c-accent-text);
+  --color-secondary: var(--c-secondary);
+  --color-danger: var(--c-danger);
+  --color-field: var(--c-field);
+  --color-on-field: var(--c-on-field);
+  --color-on-field-display: var(--c-on-field-display);
+  --color-cream: var(--c-cream);
+  --color-on-cream: var(--c-on-cream);
+  --color-ink: var(--c-ink);
+  --font-display: var(--f-display);
+  --font-body: var(--f-body);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+}
+
+@layer base {
+  html { color-scheme: light; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: var(--f-body);
+    font-size: var(--t-body);
+    line-height: var(--t-body-lh);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+  h1 { font-weight: 400; text-transform: uppercase; font-size: var(--t-hero); line-height: var(--t-hero-lh); letter-spacing: var(--t-hero-ls); }
+  h2 { font-weight: 400; text-transform: uppercase; font-size: var(--t-h2); line-height: var(--t-h2-lh); letter-spacing: var(--t-h2-ls); }
+  h3 { font-weight: 400; font-size: var(--t-h3); line-height: 1.15; text-transform: uppercase; }
+  p { text-wrap: pretty; overflow-wrap: anywhere; }
+  img, video, svg, canvas { display: block; max-width: 100%; }
+  img { height: auto; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--c-accent-text); outline-offset: 3px; border-radius: 4px; }
+  ::selection { background: var(--c-accent); color: var(--c-on-accent); }
+}
+
+@layer components {
+  .container-x { width: min(100% - 2 * var(--gutter), var(--content-max)); margin-inline: auto; }
+  .section-y { padding-block: var(--section-y); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .skip-link { position: absolute; left: var(--s-4); top: -100px; z-index: 100; padding: var(--s-3) var(--s-4); background: var(--c-text); color: var(--c-bg); border-radius: var(--r-sm); }
+  .skip-link:focus { top: var(--s-4); }
+
+  /* ——— Стикерпак: общие детали (DESIGN.md §4) ——— */
+
+  /* шахматка из поста 24, плывёт по диагонали */
+  .checker { position: absolute; inset: calc(var(--cell) * -2); z-index: var(--z-bg); pointer-events: none;
+    background: repeating-conic-gradient(var(--check-a) 0 25%, var(--check-b) 0 50%) 0 0 / calc(var(--cell) * 2) calc(var(--cell) * 2);
+    animation: drift var(--d-drift) linear infinite; }
+  @keyframes drift { to { transform: translate(calc(var(--cell) * 2), calc(var(--cell) * 2)); } }
+
+  /* плашка-«пост»: кремовая, белая рамка, тень-подложка */
+  .post { position: relative; background: var(--c-bg); color: var(--c-text); border: calc(var(--die-w) + 1px) solid var(--c-die);
+    border-radius: var(--r-lg); box-shadow: var(--shadow-post); }
+
+  /* стикер-факт */
+  .tag { display: inline-block; padding: var(--s-3) var(--s-4); border: var(--die-w) solid var(--c-die); border-radius: var(--r-sm);
+    box-shadow: var(--shadow-sticker); font: 800 1.0625rem/1.15 var(--f-body); text-transform: uppercase; letter-spacing: 0.03em; }
+  .tag b { display: block; font: 400 1.875rem/1 var(--f-display); letter-spacing: 0; }
+  .tag small { display: block; margin-top: 2px; font: 500 1rem/1.25 var(--f-body); text-transform: none; letter-spacing: 0; }
+  .t-green { background: var(--c-secondary); color: var(--c-on-secondary); }
+  .t-cream { background: var(--c-bg); color: var(--c-text); }
+  .t-sauce { background: var(--c-accent); color: var(--c-on-accent); }
+  .tilt-1 { rotate: var(--tilt-1); } .tilt-2 { rotate: var(--tilt-2); } .tilt-3 { rotate: var(--tilt-3); } .tilt-4 { rotate: var(--tilt-4); }
+
+  /* вырезка как наклейка */
+  .die { filter: var(--die-cut); }
+  .bob { animation: bob var(--d-bob) ease-in-out infinite alternate; }
+  .bob-2 { animation-duration: calc(var(--d-bob) * 1.2); animation-delay: -2s; }
+  @keyframes bob { from { transform: translateY(-6px) rotate(-2.5deg); } to { transform: translateY(8px) rotate(2.5deg); } }
+
+  /* кнопка-стикер: «соус» с белой обводкой — форма из их мем-тумблера */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-3); min-height: var(--btn-h); padding: 0 var(--s-8);
+    background: var(--c-accent); color: var(--c-on-accent); border: calc(var(--die-w) + 1px) solid var(--c-die); border-radius: var(--r-pill);
+    box-shadow: 0 7px 0 var(--c-ink-shadow); font: 800 1.1875rem/1 var(--f-body); text-decoration: none;
+    transition: transform var(--d-micro) var(--e-out); }
+  .btn:hover { transform: translateY(-2px) rotate(-1deg); }
+  .btn:active { transform: translateY(2px); }
+  .btn-green { background: var(--c-secondary); color: var(--c-on-secondary); }
+  .btn svg { width: 22px; height: 22px; flex: none; }
+
+  /* бегущая лента-«скотч»: голова стоит у левого края, бежит хвост (aria-hidden; смысл продублирован текстом) */
+  .ribbon { position: relative; display: flex; overflow: hidden; white-space: nowrap; border-block: 5px solid var(--c-die);
+    font: 400 var(--t-ribbon)/1.6 var(--f-display); text-transform: uppercase; box-shadow: 0 8px 0 var(--c-ink-shadow); }
+  .ribbon .head { position: relative; z-index: 1; flex: none; padding-inline: var(--gutter) 0.4em; background: inherit; }
+  .ribbon .run { display: flex; flex: none; animation: run var(--d-ribbon) linear infinite; }
+  .ribbon .run > span { flex: none; padding-inline: 0.4em; }
+  .ribbon.rev .run { animation-direction: reverse; }
+  .ribbon:hover .run { animation-play-state: paused; }
+  .ribbon-sm { font-size: var(--t-ribbon-sm); }
+  .ribbon .star { display: inline-block; width: 0.7em; height: 0.7em; vertical-align: 0.02em; margin-inline: 0.15em; }
+  @keyframes run { to { transform: translateX(-50%); } }
+
+  /* «прилипание» при прокрутке: scroll-driven; без поддержки — сразу итог */
+  @supports (animation-timeline: view()) {
+    .stick { animation: stick linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    .stick-l { --from-r: -14deg; --from-x: -40px; }
+    .stick-r { --from-r: 14deg; --from-x: 40px; }
+  }
+  @keyframes stick { from { opacity: 0; transform: translateX(var(--from-x, 0)) scale(1.14) rotate(var(--from-r, -8deg)); } to { opacity: 1; transform: none; } }
+
+  /* вход стикеров первого экрана — «прихлоп» по очереди */
+  .pop { animation: pop var(--d-pop) var(--e-pop) both; animation-delay: calc(var(--i, 0) * 70ms + 260ms); }
+  @keyframes pop { from { opacity: 0; transform: scale(1.18) rotate(-10deg); } to { opacity: 1; transform: none; } }
+
+  /* зерно поверх кадров с вырезками */
+  .grain { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.07; mix-blend-mode: multiply;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .stick, .pop { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .checker, .bob, .ribbon .run { animation: none !important; }
+}

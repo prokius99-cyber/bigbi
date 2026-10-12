@@ -1,0 +1,91 @@
+---
+/**
+ * craft — «Как делаем». Зелёное поле, три «полароида» (.post) с наклонами и «шлепком» при прокрутке,
+ * гигантский стикер-слоган «соус». Факты: analysis.md → «Формат». Кадры: 42, 38, 45.
+ */
+import { Image } from 'astro:assets';
+import Section from '../components/Section.astro';
+import knife from '../assets/photos/photo-tg-42.jpg';
+import oven from '../assets/photos/photo-tg-38.jpg';
+import fries from '../assets/photos/photo-tg-45.jpg';
+---
+<Section id="craft" title="Как делаем" class="craft">
+  <ul class="polaroids" role="list">
+    <li class="slot slot-1">
+      <figure class="post polaroid tilt-2 stick stick-l">
+        <Image src={knife} width={560} height={700} widths={[390, 560]} sizes="(min-width: 1024px) 30vw, 80vw" format="webp" loading="lazy" decoding="async"
+          alt="Три открытые коробки на стальной стойке, в каждой горячий разрезанный сэндвич" />
+        <figcaption>
+          <h3>Из-под ножа</h3>
+          <p>Каждый заказ собираем из-под ножа — под тебя, а&nbsp;не впрок. Внутри от&nbsp;180 до&nbsp;310&nbsp;г: от&nbsp;сладкого «Марса» до&nbsp;«Т‑Мяса» с&nbsp;ростбифом, бужениной и&nbsp;курицей гриль.</p>
+        </figcaption>
+      </figure>
+    </li>
+
+    <li class="slot slot-2">
+      <figure class="post polaroid tilt-3 stick stick-r">
+        <Image src={oven} width={560} height={700} widths={[390, 560]} sizes="(min-width: 1024px) 30vw, 80vw" format="webp" loading="lazy" decoding="async"
+          alt="Запечённый сэндвич в разрезе в картонной коробке" />
+        <figcaption>
+          <h3>Запекаем перед подачей</h3>
+          <p>Собранный сэндвич запекаем прямо перед подачей, поэтому отдаём его горячим. Авторский горячий BIGBI.</p>
+        </figcaption>
+      </figure>
+    </li>
+
+    <li class="slot slot-3">
+      <figure class="post polaroid tilt-1 stick stick-l">
+        <Image src={fries} width={560} height={700} widths={[390, 560]} sizes="(min-width: 1024px) 30vw, 80vw" format="webp" loading="lazy" decoding="async"
+          alt="Кулёк батата в крафтовой бумаге на металлическом подносе" />
+        <figcaption>
+          <h3>Соусы и фри — сами, каждый день</h3>
+          <p>Соусы и&nbsp;фри готовим сами каждый день. Также есть картофель и&nbsp;батат.</p>
+        </figcaption>
+      </figure>
+    </li>
+  </ul>
+
+  <div class="slogan-wrap stick stick-r">
+    <p class="slogan tag t-sauce tilt-4 bob bob-2">Выбирай вкус, а&nbsp;не&nbsp;цену</p>
+  </div>
+</Section>
+
+<style>
+  :global(.craft) { position: relative; overflow: clip; background: var(--c-secondary); color: var(--c-on-secondary); }
+  :global(.craft .section-title) {
+    color: var(--c-on-secondary-lg);
+    max-width: none;
+    margin-bottom: var(--s-12);
+  }
+
+  .polaroids { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-16); }
+  .slot { position: relative; padding-bottom: var(--shadow-pad, 14px); }
+  .polaroid { margin: 0; padding: var(--s-3) var(--s-3) var(--s-6); max-width: 26rem; margin-inline: auto; }
+  .polaroid :global(img) {
+    width: 100%; aspect-ratio: 4 / 5; object-fit: cover;
+    border-radius: var(--r-sm);
+  }
+  figcaption { padding: var(--s-4) var(--s-2) 0; }
+  h3 { margin-bottom: var(--s-3); }
+  figcaption p { margin: 0; font: 500 var(--t-body)/var(--t-body-lh) var(--f-body); }
+
+
+  .slogan-wrap { margin-top: var(--s-24); display: flex; justify-content: center; }
+  .slogan {
+    margin: 0; padding: var(--s-6) var(--s-8);
+    border-width: calc(var(--die-w) + 2px);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-post);
+    font: 400 var(--t-h2)/0.95 var(--f-display);
+    letter-spacing: var(--t-h2-ls);
+    text-align: center; text-wrap: balance;
+  }
+
+  @media (min-width: 1024px) {
+    .polaroids { grid-template-columns: repeat(3, 1fr); gap: var(--s-8); align-items: start; }
+    .slot-2 { margin-top: var(--s-16); }
+    .slot-3 { margin-top: var(--s-4); }
+    .polaroid { max-width: none; }
+    .slogan { padding: var(--s-8) var(--s-16); }
+  }
+</style>

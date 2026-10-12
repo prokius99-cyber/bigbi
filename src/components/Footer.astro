@@ -1,0 +1,27 @@
+---
+import { business } from '../data/site';
+import { href } from '../lib/url';
+const year = new Date().getFullYear();
+---
+<footer class="foot">
+  <div class="container-x inner">
+    <p class="name">{business.name} — сэндвич-бар</p>
+    <p>{business.address.city}, {business.address.street}, {business.address.note}</p>
+    <p>
+      <a href={`https://t.me/${business.links.telegram}`} target="_blank" rel="noopener">Telegram</a>
+      <span aria-hidden="true">/</span>
+      <a href={href('privacy')}>Политика конфиденциальности</a>
+    </p>
+    <p class="legal">© {year} {business.legal.operator}</p>
+  </div>
+</footer>
+
+<style>
+  .foot { background: var(--c-text); color: var(--c-bg); font-size: var(--t-small); line-height: var(--t-small-lh); padding-block: var(--s-12); }
+  .inner { display: grid; gap: var(--s-2); }
+  .name { font: 400 var(--t-h3)/1.1 var(--f-display); text-transform: uppercase; }
+  a { color: var(--c-bg); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; min-height: var(--tap); display: inline-flex; align-items: center; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible { outline-color: var(--c-accent); }
+  span { margin-inline: var(--s-2); }
+</style>

@@ -1,0 +1,191 @@
+---
+/**
+ * Меню — «Стикерпак» (DESIGN.md §4–5, С2): переключатель-тумблер Сытные/Сладкие, позиции — стикеры-карточки,
+ * цена группы и метки ХИТ/NEW — круглые стикеры. Данные только из data/menu.ts. Без JS обе группы видны.
+ */
+import { Image } from 'astro:assets';
+import Section from '../components/Section.astro';
+import { menu, priceNote, extras } from '../data/menu';
+import pressed from '../assets/cutouts/promo-pressed.png';
+import stack from '../assets/cutouts/stack.png';
+
+const NBSP = ' ';
+const NBHY = '‑';
+const tilts = ['tilt-3', 'tilt-2', 'tilt-4', 'tilt-1'];
+const sides = ['stick-l', 'stick-r'];
+const toneOf = (items: { badge?: string }[], i: number) => {
+  if (items[i].badge) return '';
+  const plain = items.slice(0, i).filter((x) => !x.badge).length;
+  return plain % 2 ? 'card-green' : '';
+};
+
+// зубчатый круг «наклейки»
+const burst = (teeth: number) =>
+  Array.from({ length: teeth * 2 }, (_, i) => {
+    const r = i % 2 ? 43 : 49;
+    const a = (Math.PI * i) / teeth;
+    return `${(50 + r * Math.sin(a)).toFixed(1)},${(50 - r * Math.cos(a)).toFixed(1)}`;
+  }).join(' ');
+const bigBurst = burst(16);
+const smallBurst = burst(10);
+---
+<Section id="menu" title="Сытные и сладкие" class="menu">
+  <p class="note">{priceNote}</p>
+
+  <div class="decor" aria-hidden="true">
+    <div class="bob"><Image class="die cut-ham" src={pressed} format="webp" width={254} alt="" loading="lazy" /></div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Группа меню" data-active="0" hidden>
+    <span class="thumb" aria-hidden="true"></span>
+    {menu.map((g, i) => (
+      <button type="button" role="tab" id={`menu-tab-${g.id}`} aria-controls={`menu-panel-${g.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{g.title}</button>
+    ))}
+  </div>
+
+  <div class="panels">
+    {menu.map((g) => (
+      <div class="panel" role="tabpanel" id={`menu-panel-${g.id}`} aria-labelledby={`menu-tab-${g.id}`}>
+        <div class="phead">
+          <h3 class="gtitle">{g.title}</h3>
+          <p class="price">
+            <svg class="burst" viewBox="0 0 100 100" aria-hidden="true"><polygon points={bigBurst} /></svg>
+            <span class="pv"><b>{g.price}</b><span class="rub">{NBSP}₽</span></span>
+          </p>
+        </div>
+        <ul class="grid">
+          {g.items.map((it, i) => (
+            <li class:list={['card', toneOf(g.items, i), tilts[i % 4], 'stick', sides[i % 2]]}>
+              {it.badge && (
+                <span class:list={['badge', it.badge === 'ХИТ' ? 'b-hit' : 'b-new']}>
+                  <svg class="burst" viewBox="0 0 100 100" aria-hidden="true"><polygon points={smallBurst} /></svg>
+                  <span>{it.badge}</span>
+                </span>
+              )}
+              <h4 class="iname">{it.name.replaceAll('-', NBHY)}</h4>
+              <p class="weight">{it.weight}{NBSP}г</p>
+              {it.note && <p class="comp">{it.note.replaceAll('-', NBHY).replace(/(\d) г/g, '$1' + NBSP + 'г')}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <div class="more">
+    <div class="more-box post">
+      <p class="more-t">Ещё есть</p>
+      <ul class="chips">
+        {extras.map((e, i) => <li class:list={['tag', i % 2 ? 't-green' : 't-cream']}>{e}</li>)}
+      </ul>
+    </div>
+    <div class="bob bob-2 cut-wrap" aria-hidden="true"><Image class="die cut-guac" src={stack} format="webp" width={378} alt="" loading="lazy" /></div>
+  </div>
+</Section>
+
+<script>
+  const tabs = document.querySelector<HTMLElement>('#menu .tabs');
+  if (tabs) {
+    const btns = Array.from(tabs.querySelectorAll<HTMLButtonElement>('[role=tab]'));
+    const panels = btns.map((b) => document.getElementById(b.getAttribute('aria-controls') ?? ''));
+    const select = (n: number, focus = false) => {
+      btns.forEach((b, i) => {
+        b.setAttribute('aria-selected', String(i === n));
+        b.tabIndex = i === n ? 0 : -1;
+        const p = panels[i];
+        if (p) p.hidden = i !== n;
+      });
+      tabs.dataset.active = String(n);
+      if (focus) btns[n].focus();
+    };
+    tabs.hidden = false;
+    select(0);
+    btns.forEach((b, i) => b.addEventListener('click', () => select(i)));
+    tabs.addEventListener('keydown', (e) => {
+      const cur = btns.findIndex((b) => b.getAttribute('aria-selected') === 'true');
+      const last = btns.length - 1;
+      const next = e.key === 'ArrowRight' ? (cur + 1) % btns.length
+        : e.key === 'ArrowLeft' ? (cur + last) % btns.length
+        : e.key === 'Home' ? 0 : e.key === 'End' ? last : -1;
+      if (next < 0) return;
+      e.preventDefault();
+      select(next, true);
+    });
+  }
+</script>
+
+<style>
+  :global(#menu.menu) { position: relative; overflow: clip; background: var(--c-bg); }
+  :global(#menu .section-title) { max-width: 12ch; }
+  .note { margin: calc(-1 * var(--s-4)) 0 var(--s-8); max-width: 60ch; font-size: var(--t-small); line-height: var(--t-small-lh); color: var(--c-muted); }
+  .decor { display: none; }
+
+  /* тумблер Сытные / Сладкие */
+  .tabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; width: min(100%, 26rem); margin-bottom: var(--s-12);
+    padding: 0; background: var(--c-surface); border: calc(var(--die-w) + 1px) solid var(--c-die); border-radius: var(--r-pill); box-shadow: var(--shadow-sticker); }
+  .tabs[hidden] { display: none; }
+  .tabs button { position: relative; z-index: 1; min-height: calc(var(--tap) + var(--s-6)); padding: 0 var(--s-4); background: none; border: 0; border-radius: var(--r-pill);
+    color: var(--c-text); font: 400 var(--t-h3)/1 var(--f-display); text-transform: uppercase; cursor: pointer; }
+  .thumb { position: absolute; z-index: 0; inset-block: 0; left: 0; width: 50%; background: var(--c-accent); border: var(--die-w) solid var(--c-die); border-radius: var(--r-pill);
+    box-shadow: 0 4px 0 var(--c-ink-shadow); transition: transform var(--d-state) var(--e-pop); }
+  .tabs[data-active="1"] .thumb { transform: translateX(100%); }
+  .tabs :focus-visible { outline-offset: 0; border-radius: var(--r-pill); }
+
+  .panel[hidden] { display: none; }
+  .panel + .panel { margin-top: var(--s-16); }
+  .phead { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-8); }
+  .gtitle { font-size: var(--t-h2); line-height: var(--t-h2-lh); }
+
+  /* круглый стикер цены */
+  .price { position: relative; display: grid; place-items: center; flex: none; width: 8.5rem; aspect-ratio: 1; margin: 0 var(--s-2) 0 0; rotate: var(--tilt-4); }
+  .burst { position: absolute; inset: 0; width: 100%; height: 100%; fill: var(--c-accent); stroke: var(--c-die); stroke-width: 3; stroke-linejoin: round;
+    filter: drop-shadow(0 6px 0 var(--c-ink-shadow)); animation: spin var(--d-spin) linear infinite; }
+  .pv { position: relative; display: flex; align-items: baseline; color: var(--c-on-accent); white-space: nowrap; }
+  .pv b { font: 400 calc(var(--t-h3) * 1.8)/1 var(--f-display); }
+  .rub { font: 800 var(--t-lead)/1 var(--f-body); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .grid { list-style: none; margin: 0; padding: var(--s-4) var(--s-2) 0; display: grid; gap: var(--s-8); grid-template-columns: 1fr; }
+  .card { position: relative; display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-6); padding-right: var(--s-12);
+    background: var(--c-surface); color: var(--c-text); border: var(--die-w) solid var(--c-die); border-radius: var(--r-md); box-shadow: var(--shadow-sticker); }
+  .iname { margin: 0; font: 400 var(--t-h3)/1.15 var(--f-display); text-transform: uppercase; }
+  .weight { margin: 0; font: 800 calc(var(--t-h3) * 1.35)/1 var(--f-body); font-variant-numeric: tabular-nums; }
+  .comp { margin: 0; font-size: var(--t-small); line-height: var(--t-small-lh); color: var(--c-muted); }
+  .card-green { background: var(--c-secondary); color: var(--c-on-secondary); }
+  .card-green .comp { color: var(--c-on-secondary); }
+
+  .badge { position: absolute; top: calc(-1 * var(--s-6)); right: calc(-1 * var(--s-3)); display: grid; place-items: center; width: 5rem; aspect-ratio: 1; z-index: var(--z-sticker); }
+  .badge > span { position: relative; font: 400 1.125rem/1 var(--f-display); }
+  .badge .burst { animation-duration: calc(var(--d-spin) * 0.7); }
+  .b-hit .burst { fill: var(--c-accent); }
+  .b-hit > span { color: var(--c-on-accent); }
+  .b-new .burst { fill: var(--c-secondary); }
+  .b-new > span { color: var(--c-on-secondary); }
+  /* фон под словом = цвет «звезды»: явный фон для проверки контраста */
+  .b-hit > span, .b-new > span { padding: 0.35em; border-radius: 50%; }
+  .b-hit > span { background: var(--c-accent); }
+  .b-new > span { background: var(--c-secondary); }
+
+  /* допы */
+  .more { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); margin-top: var(--s-16); }
+  .more-box { padding: var(--s-6); background: var(--c-surface); max-width: 36rem; rotate: var(--tilt-2); }
+  .more-t { margin: 0 0 var(--s-4); font: 400 var(--t-h3)/1.15 var(--f-display); text-transform: uppercase; }
+  .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .chips .tag { padding: var(--s-2) var(--s-4); font-size: var(--t-body); text-transform: none; letter-spacing: 0; box-shadow: none; }
+  .cut-wrap { display: none; }
+  .cut-guac { width: 22rem; height: auto; }
+
+  @media (min-width: 640px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .price { width: 12rem; margin: 0; }
+  }
+  @media (min-width: 1024px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+    .price { width: 14rem; }
+    .decor { display: block; position: absolute; top: calc(var(--section-y) * 0.35); right: var(--gutter); z-index: var(--z-sticker); pointer-events: none; }
+    .cut-ham { width: 18rem; height: auto; }
+    .more { flex-direction: row; align-items: center; justify-content: space-between; }
+    .cut-wrap { display: block; }
+  }
+</style>

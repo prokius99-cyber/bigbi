@@ -1,0 +1,51 @@
+---
+/**
+ * Липкая плашка на телефоне (DESIGN.md §4): «Как найти корнер 14» (.btn «соус») + круглая кнопка звонка.
+ * Выезжает, когда hero ушёл за верх экрана; прячется, пока секция visit в кадре больше чем на 30 %. Скрыта ≥ 768px.
+ */
+import { business } from '../data/site';
+---
+<nav class="bar" aria-label="Как нас найти" data-bar>
+  <a class="btn go" href="#visit">Как найти корнер&nbsp;14</a>
+  <a class="call" href={`tel:${business.phone.e164}`} aria-label={`Позвонить ${business.phone.display}`}>
+    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.6a1 1 0 01-.25 1z"/></svg>
+  </a>
+</nav>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-bar]');
+  const hero = document.querySelector('[data-section="hero"]');
+  const visit = document.querySelector('[data-section="visit"]');
+  if (bar && hero) {
+    let pastHero = false;
+    let inVisit = false;
+    const sync = () => bar.classList.toggle('is-on', pastHero && !inVisit);
+    new IntersectionObserver(([e]) => {
+      pastHero = !e.isIntersecting && e.boundingClientRect.top < 0;
+      sync();
+    }).observe(hero);
+    if (visit) {
+      new IntersectionObserver(([e]) => { inVisit = e.intersectionRatio > 0.3; sync(); }, { threshold: [0, 0.3, 1] }).observe(visit);
+    }
+  }
+</script>
+
+<style>
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bar);
+    display: flex; gap: var(--s-2); align-items: center;
+    padding: var(--s-3) var(--gutter) calc(var(--s-3) + env(safe-area-inset-bottom));
+    transform: translateY(120%); visibility: hidden;
+    transition: transform var(--d-state) var(--e-out), visibility 0s linear var(--d-state);
+  }
+  .bar:global(.is-on), .bar:focus-within { transform: none; visibility: visible; transition: transform var(--d-state) var(--e-out); }
+  .go { flex: 1; padding: 0 var(--s-4); }
+  .call {
+    flex: none; width: var(--btn-h); height: var(--btn-h); display: inline-grid; place-items: center;
+    background: var(--c-secondary); color: var(--c-on-secondary); border: calc(var(--die-w) + 1px) solid var(--c-die);
+    border-radius: 50%; box-shadow: 0 7px 0 var(--c-ink-shadow);
+  }
+  @media (min-width: 768px) { .bar { display: none; } }
+  :global(.foot) { padding-bottom: calc(var(--s-12) + var(--btn-h) + 2 * var(--s-3) + env(safe-area-inset-bottom)); }
+  @media (min-width: 768px) { :global(.foot) { padding-bottom: var(--s-12); } }
+</style>

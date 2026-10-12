@@ -1,0 +1,186 @@
+---
+/**
+ * Первый экран — «Стикерпак» (DESIGN.md §5 hero, С1): шахматка, плашка-«пост» с мем-тумблером их поста 34,
+ * вокруг ≤ 3 вырезки и ≤ 3 стикера-факта, лента «соус» снизу.
+ */
+import { Image, getImage } from 'astro:assets';
+import Ribbon from '../components/Ribbon.astro';
+import logo from '../assets/logo.jpg';
+import stack from '../assets/cutouts/stack.png';
+import ham from '../assets/cutouts/ham-cheese.png';
+import chicken from '../assets/cutouts/chicken.png';
+import batat from '../assets/cutouts/batat.png';
+import { business } from '../data/site';
+import { href } from '../lib/url';
+
+const mark = await getImage({ src: logo, format: 'webp', width: 80 });
+const metro = business.metro[0];
+---
+<section data-section="hero" aria-labelledby="hero-title" class="hero">
+  <div class="checker" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="pill brand" href={href()} aria-label={`${business.name} — на главную`}>
+      <img src={mark.src} width="36" height="36" alt="" /><span>BIGBI</span>
+    </a>
+    <a class="pill tel" href={`tel:${business.phone.e164}`}><span class="sr-only">Позвонить: </span>{business.phone.display}</a>
+  </header>
+
+  <div class="stage">
+    <div class="post board" data-board>
+      <p class="kicker" aria-hidden="true"><span class="off">Выключить стресс</span><span class="on">Включить счастье</span></p>
+      <button class="sw" type="button" aria-pressed="false" data-switch>
+        <span class="sr-only">Включить счастье</span>
+        <span class="track" aria-hidden="true"><span class="fill"></span></span>
+        <span class="handle" aria-hidden="true">
+          <span class="knob"></span>
+          <Image class="snd die" src={stack} width={378} height={339} widths={[220, 378]} sizes="(min-width: 1024px) 190px, 140px" format="webp" alt="" loading="eager" fetchpriority="high" />
+        </span>
+      </button>
+      <p class="ends" aria-hidden="true"><span class="e-off">стресс</span><span class="e-on">счастье</span></p>
+
+      <h1 id="hero-title"><span>Не бургер.</span><span>Не обычный</span><span class="hl">сэндвич.</span></h1>
+      <p class="lead">Это BIGBI: горячий, из&#8209;под ножа, запекаем прямо перед подачей.</p>
+      <div class="where">
+        <p class="where-main">ТРЦ «Меркурий», 3&nbsp;этаж, корнер&nbsp;14</p>
+        <p class="where-sub">{business.hoursDisplay} · метро «{metro.name}» {metro.distance.replace(' ', ' ')}</p>
+      </div>
+      <a class="btn cta" href="#visit" data-cta>
+        Как найти корнер&nbsp;14
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+
+    <!-- вырезки: на 390 — одна, на ≥ 1024 — три -->
+    <div class="cut c-ham pop" style="--i:3"><div class="bob">
+      <Image class="die" src={ham} width={502} height={422} widths={[260, 502]} sizes="(min-width: 1024px) 360px, 210px" format="webp" alt="Горячий сэндвич BIGBI в разрезе" />
+    </div></div>
+    <div class="cut c-chk pop" style="--i:4"><div class="bob bob-2">
+      <Image class="die" src={chicken} width={588} height={275} widths={[588]} sizes="400px" format="webp" alt="Ещё один горячий BIGBI, разрезанный пополам" />
+    </div></div>
+    <div class="cut c-bat pop" style="--i:5"><div class="bob bob-2">
+      <Image class="die" src={batat} width={472} height={498} widths={[472]} sizes="220px" format="webp" alt="Батат в крафтовой бумаге" />
+    </div></div>
+
+    <!-- стикеры-факты (analysis.md) -->
+    <div class="st s-hit pop" style="--i:1" role="img" aria-label="Хит: Цезарь">
+      <svg viewBox="0 0 160 160" aria-hidden="true">
+        <circle cx="80" cy="80" r="75" class="disc" />
+        <defs><path id="hit-ring" d="M80 80 m-58 0 a58 58 0 1 1 116 0 a58 58 0 1 1 -116 0" /></defs>
+        <g class="ring"><text class="ring-t"><textPath href="#hit-ring">ЦЕЗАРЬ · ЦЕЗАРЬ · ЦЕЗАРЬ ·</textPath></text></g>
+        <text x="80" y="94" text-anchor="middle" class="core">ХИТ</text>
+      </svg>
+    </div>
+    <div class="st s-prot pop tilt-1" style="--i:2"><span class="tag t-green"><b>54&nbsp;г</b>белка в&nbsp;Т&#8209;Мясо<small>310&nbsp;г: ростбиф, буженина, курица гриль</small></span></div>
+    <a class="st s-rate pop tilt-3" style="--i:3" href="#reviews"><span class="tag t-sauce"><b>4,7</b>на 2ГИС<small>20 оценок</small></span></a>
+  </div>
+
+  <div class="ribbons">
+    <Ribbon items={['Запекаем перед подачей', 'Соусы делаем сами', 'ТРЦ «Меркурий», 3 этаж']} tone="sauce" tilt={-2} class="rb1" />
+    <Ribbon items={['Выбирай вкус, а не цену', 'Корнер 14', 'Put some respect on the sauce']} tone="green" tilt={1.5} reverse small class="rb2" />
+  </div>
+</section>
+
+<script>
+  const sw = document.querySelector<HTMLButtonElement>('[data-switch]');
+  const board = document.querySelector('[data-board]');
+  if (sw && board) {
+    const set = (on: boolean) => { sw.setAttribute('aria-pressed', String(on)); board.classList.toggle('is-on', on); };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) set(true);
+    else setTimeout(() => set(true), 180);
+    sw.addEventListener('click', () => set(sw.getAttribute('aria-pressed') !== 'true'));
+  }
+</script>
+
+<style>
+  .hero { position: relative; isolation: isolate; overflow: clip; min-height: 100svh; padding-bottom: 15rem; }
+
+  .top { position: relative; z-index: var(--z-header); display: flex; justify-content: space-between; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--gutter); }
+  .pill {
+    display: inline-flex; align-items: center; gap: var(--s-2); min-height: var(--tap); padding: 0 var(--s-4);
+    border: var(--die-w) solid var(--c-die); border-radius: var(--r-pill); box-shadow: var(--shadow-sticker); text-decoration: none;
+  }
+  .brand { padding-left: var(--s-1); background: var(--c-bg); color: var(--c-text); rotate: var(--tilt-2); font: 400 1.25rem/1 var(--f-display); }
+  .brand img { width: 36px; height: 36px; border-radius: 50%; }
+  .tel { background: var(--c-secondary); color: var(--c-on-secondary); rotate: var(--tilt-3); font: 800 1rem/1 var(--f-body); white-space: nowrap; padding-inline: var(--s-3); }
+
+  .stage { position: relative; display: grid; justify-items: center; padding: var(--s-4) var(--gutter) 0; }
+  .board { z-index: var(--z-post); width: min(46rem, 100%); padding: var(--s-4) var(--s-4) var(--s-6); text-align: center; }
+
+  .kicker { position: relative; height: 1.4em; margin: 0 0 var(--s-2); font: 800 1rem/1.4 var(--f-body); letter-spacing: 0.06em; text-transform: uppercase; }
+  .kicker span { position: absolute; inset: 0; transition: opacity var(--d-state) var(--e-out); }
+  .kicker .on, .board:global(.is-on) .kicker .off { opacity: 0; }
+  .board:global(.is-on) .kicker .on { opacity: 1; }
+
+  /* тумблер их мема */
+  .sw { --w: 16.5rem; --h: 6.25rem; --k: calc(var(--h) - 14px);
+    position: relative; display: block; width: var(--w); height: var(--h); margin: var(--s-3) auto var(--s-2); padding: 0; border: 0; background: none; cursor: pointer; border-radius: var(--r-pill); }
+  .track { position: absolute; inset: 0; border-radius: var(--r-pill); background: var(--c-surface); border: var(--die-w) solid var(--c-text); overflow: hidden; }
+  .fill { position: absolute; inset: 0; background: var(--c-secondary); opacity: 0; transition: opacity var(--d-enter) var(--e-out); }
+  .handle { position: absolute; left: 7px; top: 7px; width: var(--k); height: var(--k); transition: transform var(--d-enter) var(--e-out); }
+  .knob { position: absolute; inset: 0; border-radius: 50%; background: var(--c-die); border: var(--die-w) solid var(--c-text); box-shadow: var(--shadow-sticker); }
+  .handle :global(.snd) { position: absolute; left: 50%; top: 50%; width: calc(var(--k) * 0.92); max-width: none; height: auto; transform: translate(-50%, -50%) rotate(-6deg); }
+  .sw[aria-pressed='true'] .fill { opacity: 1; }
+  .sw[aria-pressed='true'] .handle { transform: translateX(calc(var(--w) - var(--k) - 14px)); }
+  .sw:focus-visible { outline: 4px solid var(--c-text); outline-offset: 4px; }
+
+  /* подписи концов тумблера: мем читается и в статике */
+  .ends { display: flex; justify-content: space-between; width: min(100%, var(--w-sw, 16.5rem)); margin: 0 auto var(--s-6); font: 800 1rem/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.04em; }
+  .e-off { color: var(--c-muted); text-decoration: line-through 2px; }
+  .e-on { color: var(--c-accent-text); }
+  h1 { margin-bottom: var(--s-3); color: var(--c-text); }
+  h1 span { display: block; white-space: nowrap; }
+  h1 .hl { display: inline-block; margin-top: 0.08em; padding: 0 0.16em; background: var(--c-accent); color: var(--c-on-accent); border-radius: 0.16em; rotate: -2deg; }
+  .lead { max-width: 30ch; margin: 0 auto var(--s-4); font-size: var(--t-lead); font-weight: 700; line-height: 1.4; }
+  .where { margin: 0 auto var(--s-6); padding: var(--s-3) var(--s-4); background: var(--c-surface); border: 2px solid var(--c-text); border-radius: var(--r-sm); max-width: 30rem; }
+  .where p { margin: 0; }
+  .where-main { font-weight: 800; }
+  .where-sub { color: var(--c-muted); font-size: var(--t-small); line-height: var(--t-small-lh); }
+  .cta { width: 100%; }
+
+  /* вырезки и стикеры */
+  .cut, .st { position: absolute; z-index: var(--z-sticker); }
+  .cut :global(img) { width: 100%; height: auto; }
+  .c-ham { width: 13rem; left: -1.5rem; bottom: -8.5rem; }
+  .c-chk, .c-bat, .s-hit { display: none; }
+  .s-prot { right: var(--gutter); bottom: -7.5rem; }
+  .s-rate { display: none; text-decoration: none; }
+  .st .tag { text-align: left; }
+
+  .s-hit svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 7px 0 var(--c-ink-shadow)); }
+  .disc { fill: var(--c-accent); stroke: var(--c-die); stroke-width: 5; }
+  .ring { transform-origin: 80px 80px; animation: spin var(--d-spin) linear infinite; }
+  .ring-t { font: 800 15px var(--f-body); letter-spacing: 1.5px; fill: var(--c-on-accent); }
+  .core { font: 400 38px var(--f-display); fill: var(--c-on-accent); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ribbons { position: absolute; left: 0; right: 0; bottom: var(--s-8); z-index: var(--z-ribbon); }
+  .ribbons :global(.rb2) { display: none; }
+
+  @media (min-width: 768px) {
+    .board { padding: var(--s-6) var(--s-12) var(--s-8); }
+    .sw { --w: 21rem; --h: 7.5rem; }
+    .ends { --w-sw: 21rem; }
+    .cta { width: auto; }
+    .c-ham { width: 15rem; left: var(--gutter); bottom: -9.5rem; }
+    .s-prot { bottom: -7.5rem; right: calc(var(--gutter) + var(--s-8)); }
+    .hero { padding-bottom: 16rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .hero { min-height: max(100vh, 52rem); padding-bottom: 12rem; }
+    .stage { padding-top: var(--s-2); }
+    .board { width: 50rem; }
+    .c-ham { width: min(22.5rem, 24vw); left: max(var(--gutter), calc(50% - 46rem)); top: 6rem; }
+    .c-chk { display: block; width: min(25rem, 24vw); right: max(var(--gutter), calc(50% - 46rem)); top: 22rem; }
+    .c-bat { display: block; width: 13.75rem; left: max(var(--gutter), calc(50% - 40rem)); top: 26rem; }
+    .s-hit { display: block; width: 9.5rem; height: 9.5rem; left: calc(50% + 19rem); top: 2.5rem; }
+    .s-prot { right: auto; left: max(calc(var(--gutter) + 12rem), calc(50% - 33rem)); top: 39rem; }
+    .s-rate { display: block; right: max(calc(var(--gutter) + 2rem), calc(50% - 38rem)); top: 35rem; }
+    .ribbons { bottom: var(--s-6); }
+    .ribbons :global(.rb1) { margin-bottom: var(--s-6); }
+    .ribbons :global(.rb2) { display: flex; }
+  }
+  @media (min-width: 1024px) and (max-width: 1279px) { .c-chk, .c-bat { display: none; } .s-rate { right: var(--gutter); } }
+</style>

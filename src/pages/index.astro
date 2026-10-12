@@ -1,0 +1,31 @@
+---
+/**
+ * Главная BIGBI. Порядок и назначение секций — SPEC.md; система — DESIGN.md.
+ * У каждой секции — data-section из .premiumsite/gate.config.json.
+ */
+import Base from '../layouts/Base.astro';
+import Hero from '../sections/Hero.astro';
+import Craft from '../sections/Craft.astro';
+import Visit from '../sections/Visit.astro';
+import Menu from '../sections/Menu.astro';
+import Reviews from '../sections/Reviews.astro';
+import StickyBar from '../components/StickyBar.astro';
+import Footer from '../components/Footer.astro';
+import delaFont from '../assets/fonts/dela-gothic-one-cyr-lat.woff2?url';
+import manropeCyr from '@fontsource-variable/manrope/files/manrope-cyrillic-wght-normal.woff2?url';
+---
+<Base>
+  <Fragment slot="head">
+    <link rel="preload" href={delaFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={manropeCyr} as="font" type="font/woff2" crossorigin />
+  </Fragment>
+  <main id="main">
+    <Hero />
+    <Menu />
+    <Craft />
+    <Reviews />
+    <Visit />
+  </main>
+  <Footer />
+  <StickyBar />
+</Base>
